@@ -1,27 +1,23 @@
-"use strict";
-const FIELD_WIDTH = 10
-const FIELD_HEIGHT = 20
 
-class Tetris{
+export default class Tetris{
 
     constructor(rowCount,columnCount) {
-        // this.field = new Array(rowCount)
-        // for (let row = 0; row<rowCount;rowCount++){
-        //     this.field[row] = new Array(columnCount);
-        // }
+        this.rowCount = rowCount;
+        this.columnCount = columnCount;
 
-        this.field = [
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0,0,0]
-        ]
+
+        this.field = this.createField()
+    }
+
+    createField(){
+        let field = new Array(this.rowCount)
+        for (let row = 0; row<this.rowCount;row++){
+            field[row] = new Array(this.columnCount);
+            for (let column=0;column<this.columnCount;column++){
+                field[row][column]=0;
+            }
+        }
+        return field;
     }
 
     moveLeft(){
@@ -143,6 +139,19 @@ class Tetris{
 
     }
 
-}
+    getFieldState(){
+        let state = this.createField();
+        for (let row = 0; row<this.rowCount;row++){
+            for (let column = 0;column<this.columnCount;column++){
+                state[row][column] = this.field[row][column];
+            }
+        }
+        for (let row = 0;row<this.currentTetramino.view.length;row++){
+            for (let column = 0;column<this.currentTetramino.view[row].length;column++){
+                state[this.currentTetramino.row+row][this.currentTetramino.column+column] = this.currentTetramino.view[row][column];
+            }
+        }
+        return state;
+    }
 
-let game = new Tetris(FIELD_HEIGHT,FIELD_WIDTH)
+}
