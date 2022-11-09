@@ -21,56 +21,23 @@ export default class Tetris{
     }
 
     moveLeft(){
-        this.currentTetramino.column -= 1;
-        switch (this.isMovementCorrect()){
-            case (0) : {
-                break;
-            }
-            case (1) : {
-                this.currentTetramino.column += 1;
-                break;
-            }
-            case (2): {
-                this.currentTetramino.column += 1;
-                this.lockTetramino();
-                break;
-            }
+        if (this.isMovementCorrect(0,-1)){
+            this.currentTetramino.column-=1
+            this.checkEnd();
         }
     }
 
     moveRight(){
-        this.currentTetramino.column += 1;
-        switch (this.isMovementCorrect()){
-            case (0) : {
-                break;
-            }
-            case (1) : {
-                this.currentTetramino.column -= 1;
-                break;
-            }
-            case (2): {
-                this.currentTetramino.column -= 1;
-                this.lockTetramino();
-                break;
-            }
+        if (this.isMovementCorrect(0,1)){
+            this.currentTetramino.column+=1
+            this.checkEnd();
         }
     }
 
     moveDown(){
-        this.currentTetramino.row += 1;
-        switch (this.isMovementCorrect()){
-            case (0) : {
-                break;
-            }
-            case (1) : {
-                this.currentTetramino.row-=1;
-                break;
-            }
-            case (2): {
-                this.currentTetramino.row-=1;
-                this.lockTetramino();
-                break;
-            }
+        if (this.isMovementCorrect(1,0)){
+            this.currentTetramino.row+=1;
+            this.checkEnd();
         }
     }
 
@@ -87,35 +54,21 @@ export default class Tetris{
                 tmp[column][row] = currentTetramino[length-1-row][column];
             }
         }
-
-        this.currentTetramino.view = tmp;
-
-        switch (this.isMovementCorrect()){
-            case (0) : {
-                break;
-            }
-            default : {
-                this.currentTetramino.view = currentTetramino;
-            }
-        }
-
+        if (this.isMovementCorrect(0,0))
+            this.currentTetramino.view = tmp;
     }
 
-    isMovementCorrect() {
-        for (let row = 0; row < this.currentTetramino.view.length; row++) {
-            for (let column = 0; column < this.currentTetramino.view[row].length; column++) {
-                if (this.currentTetramino.view[row][column] && (this.field[this.currentTetramino.row + row]!== undefined) && (this.field[this.currentTetramino.row + row][this.currentTetramino.column+column]!== undefined)) {
-                    if (this.currentTetramino.view[row][column] === this.field[this.currentTetramino.row + row][this.currentTetramino.column + column]) {
-                        return 2;
-                    }
-                } else {
-                    if (this.currentTetramino.view[row][column]) {
-                        return 1;
-                    }
+    isMovementCorrect(deltaRow,deltaColumn) {
+        let currentRow = this.currentTetramino.row+deltaRow;
+        let currentColumn = this.currentTetramino.column+deltaColumn;
+        for (let row = 0;row<this.currentTetramino.view.length;row++){
+            for (let column=0;column<this.currentTetramino.view[row].length;column++){
+                if (this.currentTetramino.view[row][column] && (this.field[currentRow+row]===undefined || this.field[currentRow+row][currentColumn+column]===undefined)){
+                    return 0;
                 }
             }
         }
-        return 0;
+        return 1;
     }
 
     currentTetramino = {
@@ -128,6 +81,15 @@ export default class Tetris{
         column : 0
     }
 
+    checkEnd(){
+        for (let row=0;row<this.currentTetramino.view.length;row++){
+            for (let column=0;column<this.currentTetramino.view[row].length;column++){
+                if (this.currentTetramino.view[row][column] && (this.currentTetramino.row+row===this.rowCount-1 || this.field[this.currentTetramino.row+row+1][this.currentTetramino.column+column]))
+                    this.lockTetramino();
+            }
+        }
+    }
+
     lockTetramino(){
         for (let row = 0;row<this.currentTetramino.view.length;row++){
             for (let column = 0; column<this.currentTetramino.view.length;column++){
@@ -136,7 +98,7 @@ export default class Tetris{
                 }
             }
         }
-
+        this.createNewTetramino();
     }
 
     getFieldState(){
@@ -148,10 +110,23 @@ export default class Tetris{
         }
         for (let row = 0;row<this.currentTetramino.view.length;row++){
             for (let column = 0;column<this.currentTetramino.view[row].length;column++){
-                state[this.currentTetramino.row+row][this.currentTetramino.column+column] = this.currentTetramino.view[row][column];
+                if (this.currentTetramino.view[row][column]===1) {
+                    state[this.currentTetramino.row + row][this.currentTetramino.column + column] = this.currentTetramino.view[row][column];
+                }
             }
         }
         return state;
     }
 
+    createNewTetramino() {
+        this.currentTetramino = {
+            view : [
+                [0,1,0],
+                [0,1,1],
+                [0,1,0]
+            ],
+            row : 0,
+            column : 0
+        }
+    }
 }
