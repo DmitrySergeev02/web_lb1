@@ -18,6 +18,9 @@ document.addEventListener('keydown', event =>{
         case 'ArrowRight':
             game.moveRight();
             break;
+        case 'ArrowUp':
+            game.moveFastDown();
+            break;
         case ' ':
             game.rotateTetramino();
             break;
